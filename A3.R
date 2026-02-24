@@ -111,3 +111,104 @@ points(southB$date, # x data
        pch = 19, # symbol shape,
        col= "darkgoldenrod3")
 
+
+
+#HOMEWORK A3
+
+#Question 1
+#Make a graph that communicates about emissions from any countries of your choice. Explain how
+#you considered principles of visualization in making your graph.
+
+#Save entity for both Denmark and the United States
+
+USUKCH = datCO2 %>%
+  filter(Entity == "United States" |
+           Entity == "China" |
+           Entity == "United Kingdom")
+
+#make plot of US vs Denmark
+
+ggplot(USUKCH,
+       aes(x=Year, ymin=0, ymax=CO2, fill=Entity))+ #fill works for polygons/shaded areas 
+  geom_ribbon(alpha=0.5 )+ #fill in with 50% transparency
+  labs(title = "CO2 Emissions US, UK, China", x="Year", y="Annual emissions (tons CO2)")+
+  theme_classic()+
+  scale_x_continuous(limits = c(1800, NA))
+
+#Question 2
+#You are tasked with communicating the change in world air temperatures and CO emissions to a
+#broad audience in visually appealing graphs. Make two graphs to present in your word document side
+#by side. Plot world CO emissions on one graph and world air temperature anomalies on the other
+#graph.
+
+#Use all co2 to graph total accumulation
+
+totalglobal_co2 <- datCO2 %>%
+  group_by(Year) %>%
+  summarise(total_co2 = sum(CO2, na.rm = TRUE))
+
+#plot using ggplot
+ggplot(totalglobal_co2,
+       aes(x = Year, ymin = 0, ymax = total_co2, fill = "Total CO2")) +
+  geom_ribbon(alpha = 0.5) +
+  labs(x = "Year", y = "Annual emissions (tons CO2)") +
+  theme_classic()+
+  scale_fill_manual(values = "blue")+
+  scale_x_continuous(limits = c(1880, NA))
+
+#save world inputs as dataframe
+worldAll <- tempAnom[tempAnom$Entity == "World",]
+
+#plot using a gradient to show temperature
+ggplot(worldAll, aes(x = date, y = temperature_anomaly,
+                     color = temperature_anomaly)) +
+  geom_line(size = 1) +
+  geom_point() +
+  scale_color_gradient2(
+    low = "darkblue",
+    mid = "blue",
+    high = "red",
+    midpoint = 0
+  ) +
+  labs(
+    x = "Year",
+    y = "Temperature Anomaly",
+    color = "Temp Anomaly"
+  ) +
+  theme_classic()
+
+#Question 3
+#Look up any type of environmental data of your interest in our world in data (link in tutorial).
+#Download the csv and upload it to RStudio Cloud. Remake the graph. You may make the graph exactly
+#as it is or alter it to present the data in a different format. Explain how you considered principles of
+#visualization in making your graph. Explain the main conclusion of the graph.
+
+biodiv <- read.csv("/cloud/project/activity03/global-living-planet-index.csv")
+
+# Keep only World entities
+world <- biodiv[biodiv$Entity == "World", ]
+
+# Plot central estimate
+plot(world$Year, world$Central.estimate,
+     type = "l",
+     col = "maroon",
+     lwd = 2,
+     xlab = "Year",
+     ylab = "Percentage %",
+     main = "World Wildlife Abundance Estimates Over Time")
+
+# Add upper and lower lines
+lines(world$Year, world$Upper.estimate, col = "darkgrey", lwd = 2)
+lines(world$Year, world$Lower.estimate, col = "grey", lwd = 2)
+
+# Add legend
+legend("topright",
+       legend = c("Central", "Upper", "Lower"),
+       col = c("maroon", "darkgrey", "grey"),
+       lwd = 2)
+
+
+#Question 4
+#Copy the URL to your R script here.
+
+
